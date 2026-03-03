@@ -4,10 +4,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// REGISTER (Run only once to create admin)
+// ================= REGISTER (Run Once to Create Admin) =================
 router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
     // Check if admin already exists
     const existingUser = await User.findOne({ email });
@@ -27,14 +32,20 @@ router.post("/register", async (req, res) => {
     res.status(201).json({ message: "Admin created successfully" });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Register Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// LOGIN
+// ================= LOGIN =================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
     const user = await User.findOne({ email });
 
@@ -48,16 +59,21 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "JWT_SECRET not configured" });
+    }
+
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,   // ✅ FIXED
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     res.status(200).json({ token });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Login Error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

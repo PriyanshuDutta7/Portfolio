@@ -3,24 +3,28 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-// ✅ Import routes
+// Import routes
 const projectRoutes = require("./routes/projectRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// ✅ CORS Configuration (Deployment Ready)
+// ✅ CORS FIX (Allow both local + deployed frontend)
 app.use(cors({
-  origin: "https://portfolio-tau-gold-64.vercel.app"
+  origin: [
+    "http://localhost:5173",
+    "https://frontend-hvjaro6d-priyanshu-duttas-projects.vercel.app"
+  ],
+  credentials: true
 }));
 
 app.use(express.json());
 
-// ✅ Use routes
+// Routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 
-// ✅ MongoDB connection
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB Error:", err));
