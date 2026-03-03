@@ -11,7 +11,7 @@ const app = express();
 
 // ✅ CORS Configuration (Deployment Ready)
 app.use(cors({
-  origin: "*"
+  origin: "https://portfolio-tau-gold-64.vercel.app"
 }));
 
 app.use(express.json());
